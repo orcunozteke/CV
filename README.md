@@ -1,56 +1,46 @@
 # Orçun Özteke · CV / Portfolio site
 
 A single-page, fully static CV site. No build step, no framework, no dependencies
-to install. It runs anywhere that serves static files, and it is built to deploy on
-**GitHub Pages** as-is.
+to install. It runs anywhere that serves static files and deploys on **GitHub Pages**
+as-is. Live at https://orcunozteke.github.io/CV/
 
 ```
 .
 ├── index.html                 ← the whole site (HTML + CSS + JS inline)
 ├── .nojekyll                  ← tells GitHub Pages to serve /assets verbatim
-└── assets/
-    ├── orcun-portrait.jpg      ← hero photo (web-optimised)
-    ├── favicon.svg             ← OÖ monogram
-    └── OrcunOzteke_CV.pdf      ← the downloadable CV (linked from the buttons)
+├── assets/
+│   ├── orcun-portrait.jpg      ← hero photo (also used as the share-preview image)
+│   ├── favicon.svg             ← OÖ monogram
+│   └── OrcunOzteke_CV.pdf      ← the downloadable CV (linked from the buttons)
+└── print/
+    ├── cv-print.html           ← source of the PDF (A4, two pages, light theme)
+    └── make-pdf.js             ← renders cv-print.html → assets/OrcunOzteke_CV.pdf
 ```
 
-## Deploy to GitHub Pages
+## Editing
 
-### Option A · a dedicated project repo (recommended)
-1. Create a new repo, e.g. `cv`.
-2. Add these files at the **repo root** (`index.html`, `.nojekyll`, and the `assets/` folder).
-3. Commit and push to `main`:
-   ```bash
-   git init
-   git add .
-   git commit -m "CV site"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/cv.git
-   git push -u origin main
-   ```
-4. In the repo: **Settings → Pages → Build and deployment → Source: "Deploy from a branch"**,
-   Branch = `main`, folder = `/ (root)`, then **Save**.
-5. Live in ~1 minute at: `https://<your-username>.github.io/cv/`
+- **Content** lives in `index.html` (site) and `print/cv-print.html` (PDF). Keep the two in sync.
+- **Share preview**: Open Graph / Twitter tags and a JSON-LD `Person` block are in the `<head>`.
+  They point at the canonical URL `https://orcunozteke.github.io/CV/`.
+- **Analytics**: a commented-out, cookie-free GoatCounter snippet sits just before `</body>`.
+  Create a free account, replace `YOURCODE`, and uncomment.
+- **Photo**: the hero image is embedded as a base64 data URI inside the hero `<img>` so the page
+  renders even when opened on its own. A copy of the crop is kept at `assets/orcun-portrait.jpg`.
 
-### Option B · your user site
-If you push to a repo named `<your-username>.github.io`, the site is served at the root:
-`https://<your-username>.github.io/`
+## Regenerating the PDF
 
-## Two things to personalise before sharing
-1. **LinkedIn URL.** In `index.html`, find the line marked
-   `<!-- TODO: replace href with your LinkedIn profile URL -->` and swap the
-   `https://www.linkedin.com/` placeholder for your profile URL.
-2. **GitHub handle.** The footer/contact links to `github.com/Vitruvius-Saelta`.
-   Confirm or change it.
+```bash
+npm i -D playwright && npx playwright install chromium   # once
+node print/make-pdf.js
+```
 
-## Swapping the CV or photo later
-- Replace `assets/OrcunOzteke_CV.pdf` (keep the filename, or update the three links to it).
-- The hero photo is embedded directly in `index.html` as a base64 data URI, so it always
-  renders even when the file is opened on its own. To change it: take a 4:5 portrait crop,
-  base64-encode it, and replace the long `data:image/jpeg;base64,...` string inside the hero
-  `<img>` tag. A copy of the current crop is kept at `assets/orcun-portrait.jpg` for reference.
+## Deploy
+
+GitHub Pages serves the `main` branch from the repo root (Settings → Pages). A push to `main`
+is live within about a minute.
 
 ## Notes
+
 - Everything is relative-pathed, so it works under any sub-path GitHub Pages assigns.
 - Respects `prefers-reduced-motion`. Loads three Google Fonts (Fraunces, Hanken Grotesk,
-  JetBrains Mono); if you ever need it fully offline, self-host those.
+  JetBrains Mono); self-host them if the site ever needs to run fully offline.
